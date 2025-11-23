@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Surat Natal Interaktif</title>
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #FFFFFF;
+  background-size: cover;
+  font-family: "Poppins", sans-serif;
+  user-select: none;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Video background */
+#video-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+  display: none; /* tersembunyi sampai klik */
+}
+
+/* Amplop */
+.envelope-container {
+  position: relative;
+  width: 500px;
+  height: 380px;
+  z-index: 2;
+}
+
+.envelope {
+  width: 100%;
+  height: 100%;
+  background: #d62c2c;
+  background-size: 120px;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  transition: transform 0.5s ease;
+  z-index: 1;
+}
+
+.envelope.opened { transform: translateY(-40px); }
+
+/* Tutup amplop */
+.flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #b71f1f;
+  clip-path: polygon(0 0, 100% 0, 50% 50%);
+  transform-origin: top;
+  transition: transform 0.5s ease;
+  z-index: 2;
+}
+
+.flap.opened { transform: rotateX(180deg); }
+
+/* Tombol emoji pohon natal di tengah amplop */
+#christmas-tree {
+  position: absolute;
+  top: 95px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  color: #d62c2c;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 10;
+  pointer-events: auto;
+  transition: transform 0.2s ease;
+}
+
+#christmas-tree:hover {
+  transform: translateX(-50%) scale(1.1);
+}
+
+/* Surat */
+.letter {
+  position: absolute;
+  width: 90%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  background: rgba(255,255,255,0.95);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  opacity: 0;
+  transition: all 0.6s ease;
+  text-align: center;
+  z-index: 5;
+}
+
+.letter.show {
+  opacity: 1;
+  transform: translate(-50%, -10%) scale(1);
+}
+
+.letter h2 { margin-top: 0; color: #d62c2c; }
+.letter p { line-height: 1.6; font-size: 16px; color: #333; }
+
+</style>
+</head>
+<body>
+
+<video id="video-bg" muted loop preload="auto"></video>
+<audio id="bg-music" loop preload="auto"></audio>
+
+<div class="envelope-container">
+  <div class="envelope" id="envelope"></div>
+  <div class="flap" id="flap"></div>
+  
+  <!-- Tombol emoji pohon natal di tengah amplop -->
+  <div id="christmas-tree" title="Klik untuk membuka surat">🎄</div>
+  
+  <div class="letter" id="letter">
+    <h2>Merry Christmas My Love</h2>
+    <p>
+      Merry Christmas, Fio.<br><br>
+      This is the first time I've celebrated Christmas with someone who loves me the way you do.<br>
+      I hope you are always healthy, and I hope you stay far away from problems.<br><br>
+      From Lucas,<br>
+      <span style="color: red; font-weight: bold;">I love you.</span>
+    </p>
+  </div>
+</div>
+
+<script>
+const flap = document.getElementById("flap");
+const envelope = document.getElementById("envelope");
+const tree = document.getElementById("christmas-tree");
+const letter = document.getElementById("letter");
+const video = document.getElementById("video-bg");
+const audio = document.getElementById("bg-music");
+
+// ganti file sesuai milikmu
+video.src = "video-background.mp4";
+audio.src = "backsound.mp3";
+
+let opened = false;
+
+tree.addEventListener("click", () => {
+  if (opened) return;
+
+  flap.classList.add("opened");
+  envelope.classList.add("opened");
+  setTimeout(() => { letter.classList.add("show"); }, 400);
+  video.style.display = "block";
+
+  // tunggu video & audio siap sebelum play untuk hindari lag
+  const playVideo = new Promise(resolve => {
+    if (video.readyState >= 3) resolve();
+    else video.addEventListener("canplaythrough", resolve, {once:true});
+  });
+
+  const playAudio = new Promise(resolve => {
+    if (audio.readyState >= 3) resolve();
+    else audio.addEventListener("canplaythrough", resolve, {once:true});
+  });
+
+  Promise.all([playVideo, playAudio]).then(() => {
+    video.play();
+    audio.volume = 1;
+    audio.play();
+  });
+
+  opened = true;
+});
+</script>
+
+</body>
+</html>
+
